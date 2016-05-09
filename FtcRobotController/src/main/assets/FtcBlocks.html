@@ -1,0 +1,691 @@
+<!DOCTYPE html>
+<html>
+<!--
+  Author: lizlooney@google.com (Liz Looney)
+-->
+<head>
+  <meta charset="utf-8">
+  <title>FTC Blocks</title>
+  <script src="blockly/blockly_compressed.js"></script>
+  <script src="blockly/javascript_compressed.js"></script>
+  <script src="blockly/blocks_compressed.js"></script>
+  <script src="blockly/msg/js/en.js"></script>
+  <script src="blocks/dc_motor.js"></script>
+  <script src="blocks/linear_op_mode.js"></script>
+  <script src="blocks/optical_distance_sensor.js"></script>
+  <script src="blocks/robot_controller.js"></script>
+  <script src="blocks/touch_sensor.js"></script>
+  <style>
+    html, body {
+      height: 100%;
+      margin: 0;
+    }
+    body {
+      background-color: #fff;
+      font-family: sans-serif;
+      overflow: hidden;
+    }
+    h1 {
+      font-weight: normal;
+      font-size: 140%;
+    }
+    table {
+      height: 100%;
+      width: 100%;
+    }
+    #blocklyArea {
+      height: 99%;
+    }
+  </style>
+</head>
+<body>
+  <table>
+    <tr>
+      <td valign="top">
+        <h1>FTC Blocks<h1>
+        <button onclick="save()">Save</button>
+      </td>
+      <td>
+        <textarea style="display:none" id="generatedCodeBox" rows="6" cols="60">...</textarea>
+      </td>
+    </tr>
+    <tr>
+      <td id="blocklyArea" colspan="2">
+      </td>
+    </tr>
+  </table>
+
+  <div id="blocklyDiv" style="position: absolute"></div>
+
+  <xml id="toolbox" style="display: none">
+    <category name="FtcLinearOpMode">
+      <!--
+      FtcLinearOpMode.WaitForstart method.
+      -->
+      <block type="linearOpMode_waitForStart"></block>
+      <!--
+      FtcLinearOpMode.OpModeIsActive method.
+      -->
+      <block type="linearOpMode_opModeIsActive"></block>
+      <!--
+      FtcLinearOpMode.Sleep method.
+      Initial milliseconds value is 1000.
+      -->
+      <block type="linearOpMode_sleep">
+        <value name="MILLISECONDS">
+          <block type="math_number">
+            <field name="NUM">1000</field>
+          </block>
+        </value>
+      </block>
+    </category>
+
+    <category name="FtcRobotController">
+      <!--
+      FtcRobotControllerTelemetry.AddNumericData.
+      Initial key value is 'abc'.
+      Initial msg socket is empty.
+      -->
+      <block type="robotController_telemetryAddNumericData">
+        <value name="KEY">
+          <block type="text">
+            <field name="TEXT">abc</field>
+          </block>
+        </value>
+      </block>
+      <!--
+      FtcRobotControllerTelemetry.AddTextData.
+      Initial key value is 'abc'.
+      Initial msg socket is empty.
+      -->
+      <block type="robotController_telemetryAddTextData">
+        <value name="KEY">
+          <block type="text">
+            <field name="TEXT">abc</field>
+          </block>
+        </value>
+      </block>
+    </category>
+
+    <category name="FtcDcMotor" expanded="true">
+      <category name="Dual">
+        <!--
+        Set power for both motors.
+        Initial left motor power value is 1.
+        Initial right motor power value is 1.
+        -->
+        <block type="dcMotor_setProperty">
+          <field name="MOTOR">FtcDcMotorLeft</field>
+          <field name="PROP">Power</field>
+          <value name="VALUE">
+            <block type="math_number">
+              <field name="NUM">1</field>
+            </block>
+          </value>
+          <next>
+          <block type="dcMotor_setProperty">
+            <field name="MOTOR">FtcDcMotorRight</field>
+            <field name="PROP">Power</field>
+            <value name="VALUE">
+              <block type="math_number">
+                <field name="NUM">1</field>
+              </block>
+            </value>
+          </block>
+          </next>
+        </block>
+        <!--
+        Set power for both motors.
+        Initial left motor power value is 0.
+        Initial right motor power value is 0.
+        -->
+        <block type="dcMotor_setProperty">
+          <field name="MOTOR">FtcDcMotorLeft</field>
+          <field name="PROP">Power</field>
+          <value name="VALUE">
+            <block type="math_number">
+              <field name="NUM">0</field>
+            </block>
+          </value>
+          <next>
+          <block type="dcMotor_setProperty">
+            <field name="MOTOR">FtcDcMotorRight</field>
+            <field name="PROP">Power</field>
+            <value name="VALUE">
+              <block type="math_number">
+                <field name="NUM">0</field>
+              </block>
+            </value>
+          </block>
+          </next>
+        </block>
+        <!--
+        Set run mode for both motors.
+        -->
+        <block type="dcMotor_setProperty">
+          <field name="MOTOR">FtcDcMotorLeft</field>
+          <field name="PROP">Mode</field>
+          <value name="VALUE">
+            <block type="dcMotor_constant_runMode">
+              <field name="MOTOR">FtcDcMotorLeft</field>
+            </block>
+          </value>
+          <next>
+          <block type="dcMotor_setProperty">
+            <field name="MOTOR">FtcDcMotorRight</field>
+            <field name="PROP">Mode</field>
+            <value name="VALUE">
+              <block type="dcMotor_constant_runMode">
+                <field name="MOTOR">FtcDcMotorLeft</field>
+              </block>
+            </value>
+          </block>
+          </next>
+        </block>
+        <!--
+        Set target position for both motors.
+        -->
+        <block type="dcMotor_setProperty">
+          <field name="MOTOR">FtcDcMotorLeft</field>
+          <field name="PROP">TargetPosition</field>
+          <next>
+          <block type="dcMotor_setProperty">
+            <field name="MOTOR">FtcDcMotorRight</field>
+            <field name="PROP">TargetPosition</field>
+          </block>
+          </next>
+        </block>
+      </category>
+      <category name="Individual">
+        <!--
+        Get current position of a motor.
+        Initial motor value is the left motor.
+        -->
+        <block type="dcMotor_getProperty">
+          <field name="MOTOR">FtcDcMotorLeft</field>
+          <field name="PROP">CurrentPosition</field>
+        </block>
+        <!--
+        Set direction of a motor.
+        Initial motor value is the left motor.
+        Initial direction value is reverse.
+        -->
+        <block type="dcMotor_setProperty">
+          <field name="MOTOR">FtcDcMotorLeft</field>
+          <field name="PROP">Direction</field>
+          <value name="VALUE">
+            <block type="dcMotor_constant_direction">
+              <field name="MOTOR">FtcDcMotorLeft</field>
+            </block>
+          </value>
+        </block>
+        <!--
+        Get direction of a motor.
+        Initial motor value is the left motor.
+        -->
+        <block type="dcMotor_getProperty">
+          <field name="MOTOR">FtcDcMotorLeft</field>
+          <field name="PROP">Direction</field>
+        </block>
+        <!--
+        Set run mode for a motors.
+        Initial motor value is the left motor.
+        Initial run mode is run using encoders
+        -->
+        <block type="dcMotor_setProperty">
+          <field name="MOTOR">FtcDcMotorLeft</field>
+          <field name="PROP">Mode</field>
+          <value name="VALUE">
+            <block type="dcMotor_constant_runMode">
+              <field name="MOTOR">FtcDcMotorLeft</field>
+            </block>
+          </value>
+        </block>
+        <!--
+        Get run mode of a motor.
+        Initial motor value is the left motor.
+        -->
+        <block type="dcMotor_getProperty">
+          <field name="MOTOR">FtcDcMotorLeft</field>
+          <field name="PROP">Mode</field>
+        </block>
+        <!--
+        Set power for a motor.
+        Initial motor value is the left motor.
+        Initial power value is 1.
+        -->
+        <block type="dcMotor_setProperty">
+          <field name="MOTOR">FtcDcMotorLeft</field>
+          <field name="PROP">Power</field>
+          <value name="VALUE">
+            <block type="math_number">
+              <field name="NUM">1</field>
+            </block>
+          </value>
+        </block>
+        <!--
+        Get power of a motor.
+        Initial motor value is the left motor.
+        -->
+        <block type="dcMotor_getProperty">
+          <field name="MOTOR">FtcDcMotorLeft</field>
+          <field name="PROP">Power</field>
+        </block>
+        <!--
+        Set target position for a motor.
+        Initial motor value is the left motor.
+        -->
+        <block type="dcMotor_setProperty">
+          <field name="MOTOR">FtcDcMotorLeft</field>
+          <field name="PROP">TargetPosition</field>
+        </block>
+        <!--
+        DcMotor.TargetPosition getter
+        -->
+        <block type="dcMotor_getProperty">
+          <field name="MOTOR">FtcDcMotorLeft</field>
+          <field name="PROP">TargetPosition</field>
+        </block>
+      </category>
+      <category name="Constants">
+        <!--
+        RunMode constants
+        -->
+        <block type="dcMotor_constant_runMode">
+          <field name="MOTOR">FtcDcMotorLeft</field>
+        </block>
+        <!--
+        Constants for Direction
+        -->
+        <block type="dcMotor_constant_direction">
+          <field name="MOTOR">FtcDcMotorLeft</field>
+        </block>
+      </category>
+    </category>
+
+    <category name="FtcTouchSensor">
+      <!--
+      TouchSensor.IsPressed getter
+      -->
+      <block type="touchSensor_getProperty">
+          <field name="TOUCH_SENSOR">FtcTouchSensor1</field>
+          <field name="PROP">IsPressed</field>
+      </block>
+    </category>
+    <category name="FtcOpticalDistanceSensor">
+      <!--
+      OpticalDistanceSensor.LightDetected getter
+      -->
+      <block type="opticalDistanceSensor_getProperty">
+          <field name="OPTICAL_DISTANCE_SENSOR">FtcOpticalDistanceSensor1</field>
+          <field name="PROP">LightDetected</field>
+      </block>
+    </category>
+    <sep></sep>
+
+    <!--
+    The following categories are from google-blockly-83ecf14/demos/toolbox/index.html.
+    -->
+    <category name="Logic" colour="210">
+      <category name="If">
+        <block type="controls_if"></block>
+        <block type="controls_if">
+          <mutation else="1"></mutation>
+        </block>
+        <block type="controls_if">
+          <mutation elseif="1" else="1"></mutation>
+        </block>
+      </category>
+      <category name="Boolean">
+        <block type="logic_compare"></block>
+        <block type="logic_operation"></block>
+        <block type="logic_negate"></block>
+        <block type="logic_boolean"></block>
+        <block type="logic_null"></block>
+        <block type="logic_ternary"></block>
+      </category>
+    </category>
+    <category name="Loops" colour="120">
+      <block type="controls_repeat_ext">
+        <value name="TIMES">
+          <block type="math_number">
+            <field name="NUM">10</field>
+          </block>
+        </value>
+      </block>
+      <block type="controls_whileUntil"></block>
+      <block type="controls_for">
+        <field name="VAR">i</field>
+        <value name="FROM">
+          <block type="math_number">
+            <field name="NUM">1</field>
+          </block>
+        </value>
+        <value name="TO">
+          <block type="math_number">
+            <field name="NUM">10</field>
+          </block>
+        </value>
+        <value name="BY">
+          <block type="math_number">
+            <field name="NUM">1</field>
+          </block>
+        </value>
+      </block>
+      <block type="controls_forEach"></block>
+      <block type="controls_flow_statements"></block>
+    </category>
+    <category name="Math" colour="230">
+      <block type="math_number"></block>
+      <block type="math_arithmetic"></block>
+      <block type="math_single"></block>
+      <block type="math_trig"></block>
+      <block type="math_constant"></block>
+      <block type="math_number_property"></block>
+      <block type="math_change">
+        <value name="DELTA">
+          <block type="math_number">
+            <field name="NUM">1</field>
+          </block>
+        </value>
+      </block>
+      <block type="math_round"></block>
+      <block type="math_on_list"></block>
+      <block type="math_modulo"></block>
+      <block type="math_constrain">
+        <value name="LOW">
+          <block type="math_number">
+            <field name="NUM">1</field>
+          </block>
+        </value>
+        <value name="HIGH">
+          <block type="math_number">
+            <field name="NUM">100</field>
+          </block>
+        </value>
+      </block>
+      <block type="math_random_int">
+        <value name="FROM">
+          <block type="math_number">
+            <field name="NUM">1</field>
+          </block>
+        </value>
+        <value name="TO">
+          <block type="math_number">
+            <field name="NUM">100</field>
+          </block>
+        </value>
+      </block>
+      <block type="math_random_float"></block>
+    </category>
+    <category name="Lists">
+      <block type="lists_create_empty"></block>
+      <block type="lists_create_with"></block>
+      <block type="lists_repeat">
+        <value name="NUM">
+          <block type="math_number">
+            <field name="NUM">5</field>
+          </block>
+        </value>
+      </block>
+      <block type="lists_length"></block>
+      <block type="lists_isEmpty"></block>
+      <block type="lists_indexOf"></block>
+      <block type="lists_getIndex"></block>
+      <block type="lists_setIndex"></block>
+    </category>
+    <category name="Variables" colour="330" custom="VARIABLE"></category>
+    <category name="Functions" colour="290" custom="PROCEDURE"></category>
+    <sep></sep>
+    <category name="Library" expanded="true">
+      <category name="Randomize">
+        <block type="procedures_defnoreturn">
+          <mutation>
+            <arg name="list"></arg>
+          </mutation>
+          <field name="NAME">randomize</field>
+          <statement name="STACK">
+            <block type="controls_for" inline="true">
+              <field name="VAR">x</field>
+              <value name="FROM">
+                <block type="math_number">
+                  <field name="NUM">1</field>
+                </block>
+              </value>
+              <value name="TO">
+                <block type="lists_length" inline="false">
+                  <value name="VALUE">
+                    <block type="variables_get">
+                      <field name="VAR">list</field>
+                    </block>
+                  </value>
+                </block>
+              </value>
+              <value name="BY">
+                <block type="math_number">
+                  <field name="NUM">1</field>
+                </block>
+              </value>
+              <statement name="DO">
+                <block type="variables_set" inline="false">
+                  <field name="VAR">y</field>
+                  <value name="VALUE">
+                    <block type="math_random_int" inline="true">
+                      <value name="FROM">
+                        <block type="math_number">
+                          <field name="NUM">1</field>
+                        </block>
+                      </value>
+                      <value name="TO">
+                        <block type="lists_length" inline="false">
+                          <value name="VALUE">
+                            <block type="variables_get">
+                              <field name="VAR">list</field>
+                            </block>
+                          </value>
+                        </block>
+                      </value>
+                    </block>
+                  </value>
+                  <next>
+                    <block type="variables_set" inline="false">
+                      <field name="VAR">temp</field>
+                      <value name="VALUE">
+                        <block type="lists_getIndex" inline="true">
+                          <mutation statement="false" at="true"></mutation>
+                          <field name="MODE">GET</field>
+                          <field name="WHERE">FROM_START</field>
+                          <value name="AT">
+                            <block type="variables_get">
+                              <field name="VAR">y</field>
+                            </block>
+                          </value>
+                          <value name="VALUE">
+                            <block type="variables_get">
+                              <field name="VAR">list</field>
+                            </block>
+                          </value>
+                        </block>
+                      </value>
+                      <next>
+                        <block type="lists_setIndex" inline="false">
+                          <value name="AT">
+                            <block type="variables_get">
+                              <field name="VAR">y</field>
+                            </block>
+                          </value>
+                          <value name="LIST">
+                            <block type="variables_get">
+                              <field name="VAR">list</field>
+                            </block>
+                          </value>
+                          <value name="TO">
+                            <block type="lists_getIndex" inline="true">
+                              <mutation statement="false" at="true"></mutation>
+                              <field name="MODE">GET</field>
+                              <field name="WHERE">FROM_START</field>
+                              <value name="AT">
+                                <block type="variables_get">
+                                  <field name="VAR">x</field>
+                                </block>
+                              </value>
+                              <value name="VALUE">
+                                <block type="variables_get">
+                                  <field name="VAR">list</field>
+                                </block>
+                              </value>
+                            </block>
+                          </value>
+                          <next>
+                            <block type="lists_setIndex" inline="false">
+                              <value name="AT">
+                                <block type="variables_get">
+                                  <field name="VAR">x</field>
+                                </block>
+                              </value>
+                              <value name="LIST">
+                                <block type="variables_get">
+                                  <field name="VAR">list</field>
+                                </block>
+                              </value>
+                              <value name="TO">
+                                <block type="variables_get">
+                                  <field name="VAR">temp</field>
+                                </block>
+                              </value>
+                            </block>
+                          </next>
+                        </block>
+                      </next>
+                    </block>
+                  </next>
+                </block>
+              </statement>
+            </block>
+          </statement>
+        </block>
+      </category>
+      <category name="Jabberwocky">
+        <block type="text_print">
+          <value name="TEXT">
+            <block type="text">
+              <field name="TEXT">'Twas brillig, and the slithy toves</field>
+            </block>
+          </value>
+          <next>
+            <block type="text_print">
+              <value name="TEXT">
+                <block type="text">
+                  <field name="TEXT">  Did gyre and gimble in the wabe:</field>
+                </block>
+              </value>
+              <next>
+                <block type="text_print">
+                  <value name="TEXT">
+                    <block type="text">
+                      <field name="TEXT">All mimsy were the borogroves,</field>
+                    </block>
+                  </value>
+                  <next>
+                    <block type="text_print">
+                      <value name="TEXT">
+                        <block type="text">
+                          <field name="TEXT">  And the mome raths outgrabe.</field>
+                        </block>
+                      </value>
+                    </block>
+                  </next>
+                </block>
+              </next>
+            </block>
+          </next>
+        </block>
+        <block type="text_print">
+          <value name="TEXT">
+            <block type="text">
+              <field name="TEXT">"Beware the Jabberwock, my son!</field>
+            </block>
+          </value>
+          <next>
+            <block type="text_print">
+              <value name="TEXT">
+                <block type="text">
+                  <field name="TEXT">  The jaws that bite, the claws that catch!</field>
+                </block>
+              </value>
+              <next>
+                <block type="text_print">
+                  <value name="TEXT">
+                    <block type="text">
+                      <field name="TEXT">Beware the Jubjub bird, and shun</field>
+                    </block>
+                  </value>
+                  <next>
+                    <block type="text_print">
+                      <value name="TEXT">
+                        <block type="text">
+                          <field name="TEXT">  The frumious Bandersnatch!"</field>
+                        </block>
+                      </value>
+                    </block>
+                  </next>
+                </block>
+              </next>
+            </block>
+          </next>
+        </block>
+      </category>
+    </category>
+  </xml>
+
+  <script>
+    var blocklyArea = document.getElementById('blocklyArea');
+    var blocklyDiv = document.getElementById('blocklyDiv');
+    var workspace = Blockly.inject(blocklyDiv,
+        {media: 'blockly/media/',
+         trashcan: false,
+         toolbox: document.getElementById('toolbox')});
+    var onresize = function(e) {
+      // Compute the absolute coordinates and dimensions of blocklyArea.
+      var element = blocklyArea;
+      var x = 0;
+      var y = 0;
+      do {
+        x += element.offsetLeft;
+        y += element.offsetTop;
+        element = element.offsetParent;
+      } while (element);
+      // Position blocklyDiv over blocklyArea.
+      blocklyDiv.style.left = x + 'px';
+      blocklyDiv.style.top = y + 'px';
+      blocklyDiv.style.width = blocklyArea.offsetWidth + 'px';
+      blocklyDiv.style.height = blocklyArea.offsetHeight + 'px';
+    };
+    window.addEventListener('resize', onresize, false);
+    onresize();
+
+    function save() {
+      // Get the blocks as xml (text).
+      var xml = Blockly.Xml.workspaceToDom(workspace);
+      var xmlText = Blockly.Xml.domToText(xml);
+      // Generate JavaScript code.
+      Blockly.JavaScript.addReservedWords('runOpMode');
+      Blockly.JavaScript.addReservedWords('blocksOpmode');
+      Blockly.JavaScript.addReservedWords('linearOpMode');
+      Blockly.JavaScript.addReservedWords('motorL');
+      Blockly.JavaScript.addReservedWords('motorR');
+      Blockly.JavaScript.addReservedWords('robotController');
+      Blockly.JavaScript.addReservedWords('sensorOpticalDistance');
+      Blockly.JavaScript.addReservedWords('sensorTouch');
+      var code = Blockly.JavaScript.workspaceToCode(workspace);
+      if (typeof blocksIO !== 'undefined') {
+        // Save it to sdcard.
+        blocksIO.saveBlocks(xmlText, code);
+      } else {
+        document.getElementById('generatedCodeBox').textContent = code;
+        document.getElementById('generatedCodeBox').style.display = 'block';
+      }
+    }
+  </script>
+</body>
+</html>

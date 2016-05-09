@@ -50,11 +50,13 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.View;
+import android.webkit.WebView;
 import android.widget.ImageButton;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.google.blocks.BlocksOpMode;
 import com.qualcomm.ftccommon.DbgLog;
 import com.qualcomm.ftccommon.FtcEventLoop;
 import com.qualcomm.ftccommon.FtcRobotControllerService;
@@ -185,6 +187,8 @@ public class FtcRobotControllerActivity extends Activity {
       }
     });
 
+    BlocksOpMode.setActivityAndWebView(this, (WebView) findViewById(R.id.webViewBlocksRuntime));
+
     textDeviceName = (TextView) findViewById(R.id.textDeviceName);
     textWifiDirectStatus = (TextView) findViewById(R.id.textWifiDirectStatus);
     textRobotStatus = (TextView) findViewById(R.id.textRobotStatus);
@@ -286,6 +290,10 @@ public class FtcRobotControllerActivity extends Activity {
   @Override
   public boolean onOptionsItemSelected(MenuItem item) {
     switch (item.getItemId()) {
+      case R.id.action_blocks:
+        Intent blocksIntent = new Intent("com.google.blocks.BlocksActivity.intent.action.Launch");
+        startActivity(blocksIntent);
+        return true;
       case R.id.action_restart_robot:
         dimmer.handleDimTimer();
         Toast.makeText(context, "Restarting Robot", Toast.LENGTH_SHORT).show();
