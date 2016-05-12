@@ -4,7 +4,7 @@
  */
 
 createRobotControllerDropdown_ = function() {
-// The identifier must match the identifier used in BlocksOpMode.java.
+  // The identifier must match the identifier used in BlocksOpMode.java.
   var ROBOT_CONTROLLER_IDENTIFIER = 'robotController';
   var CHOICES = [
       ['FtcRobotController1', ROBOT_CONTROLLER_IDENTIFIER]];

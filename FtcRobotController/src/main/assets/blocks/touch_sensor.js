@@ -7,7 +7,7 @@ createTouchSensorDropdown_ = function() {
   // The identifier must match the identifier used in BlocksOpMode.java.
   var TOUCH_SENSOR_IDENTIFIER = 'sensorTouch';
   var CHOICES = [
-      ['FtcTouchSensor1', Blockly.Blocks.TOUCH_SENSOR_IDENTIFIER]];
+      ['FtcTouchSensor1', TOUCH_SENSOR_IDENTIFIER]];
   return new Blockly.FieldDropdown(CHOICES);
 };
 

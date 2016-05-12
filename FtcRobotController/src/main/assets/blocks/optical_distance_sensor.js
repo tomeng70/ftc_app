@@ -7,7 +7,7 @@ createOpticalDistanceSensorDropdown_ = function() {
   // The identifier must match the identifier used in BlocksOpMode.java.
   var OPTICAL_DISTANCE_SENSOR_IDENTIFIER = 'sensorOpticalDistance';
   var CHOICES = [
-      ['FtcOpticalDistanceSensor1', Blockly.Blocks.OPTICAL_DISTANCE_SENSOR_IDENTIFIER]];
+      ['FtcOpticalDistanceSensor1', OPTICAL_DISTANCE_SENSOR_IDENTIFIER]];
   return new Blockly.FieldDropdown(CHOICES);
 };
 

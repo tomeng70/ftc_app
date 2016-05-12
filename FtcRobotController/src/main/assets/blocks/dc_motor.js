@@ -3,23 +3,14 @@
  * @author lizlooney@google.com (Liz Looney)
  */
 
-getVisibleName_ = function(namesAndValues, value) {
+createMotorDropdown_ = function() {
   // The identifiers must match the identifiers used in BlocksOpMode.java.
   var LEFT_MOTOR_IDENTIFIER = 'motorL';
   var RIGHT_MOTOR_IDENTIFIER = 'motorR';
-  for (var i = 0; i < namesAndValues.length; i++) {
-    if (namesAndValues[i][1] == value) {
-      return namesAndValues[i][0];
-    }
-  }
-  return '';
-};
-
-createMotorDropdown_ = function() {
-  var MOTOR_CHOICES = [
-      ['FtcDcMotorLeft', Blockly.Blocks.LEFT_MOTOR_IDENTIFIER],
-      ['FtcDcMotorRight', Blockly.Blocks.RIGHT_MOTOR_IDENTIFIER]];
-  return new Blockly.FieldDropdown(MOTOR_CHOICES);
+  var CHOICES = [
+      ['FtcDcMotorLeft', LEFT_MOTOR_IDENTIFIER],
+      ['FtcDcMotorRight', RIGHT_MOTOR_IDENTIFIER]];
+  return new Blockly.FieldDropdown(CHOICES);
 };
 
 Blockly.Blocks['dcMotor_setProperty'] = {

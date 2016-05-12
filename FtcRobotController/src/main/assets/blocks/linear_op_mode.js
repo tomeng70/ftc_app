@@ -4,7 +4,7 @@
  */
 
 createLinearOpModeDropdown_ = function() {
-// The identifier must match the identifier used in BlocksOpMode.java.
+  // The identifier must match the identifier used in BlocksOpMode.java.
   var LINEAR_OP_MODE_IDENTIFIER = 'linearOpMode';
   var CHOICES = [
       ['FtcLinearOpMode1', LINEAR_OP_MODE_IDENTIFIER]];
