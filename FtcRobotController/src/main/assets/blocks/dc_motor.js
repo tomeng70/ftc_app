@@ -133,8 +133,8 @@ Blockly.Blocks['dcMotor_constant_runMode'] = {
 };
 
 Blockly.JavaScript['dcMotor_constant_runMode'] = function(block) {
-  var runMode = block.getFieldValue('RUN_MODE');
-  return [runMode, Blockly.JavaScript.ORDER_ATOMIC];
+  var code = '"' + block.getFieldValue('RUN_MODE') + '"';
+  return [code, Blockly.JavaScript.ORDER_ATOMIC];
 };
 
 Blockly.Blocks['dcMotor_constant_direction'] = {
@@ -166,6 +166,6 @@ Blockly.Blocks['dcMotor_constant_direction'] = {
 };
 
 Blockly.JavaScript['dcMotor_constant_direction'] = function(block) {
-  var direction = block.getFieldValue('DIRECTION');
-  return [direction, Blockly.JavaScript.ORDER_ATOMIC];
+  var code = '"' + block.getFieldValue('DIRECTION') + '"';
+  return [code, Blockly.JavaScript.ORDER_ATOMIC];
 };

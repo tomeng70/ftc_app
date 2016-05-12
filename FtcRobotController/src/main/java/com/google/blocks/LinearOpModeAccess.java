@@ -3,6 +3,7 @@ package com.google.blocks;
 import android.webkit.JavascriptInterface;
 
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
+import com.qualcomm.robotcore.util.RobotLog;
 
 /**
  * A class that provides JavaScript access to a {@link LinearOpMode}.

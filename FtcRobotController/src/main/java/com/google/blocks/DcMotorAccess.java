@@ -5,6 +5,8 @@ import android.webkit.JavascriptInterface;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotor.Direction;
 import com.qualcomm.robotcore.hardware.DcMotorController.RunMode;
+import com.qualcomm.robotcore.hardware.HardwareMap;
+import com.qualcomm.robotcore.util.RobotLog;
 
 import java.util.Locale;
 
@@ -16,45 +18,68 @@ import java.util.Locale;
 class DcMotorAccess {
   private final DcMotor dcMotor;
 
-  DcMotorAccess(DcMotor dcMotor) {
+  DcMotorAccess(HardwareMap hardwareMap, String deviceName) {
+    DcMotor dcMotor = null;
+    try {
+      dcMotor = hardwareMap.dcMotor.get(deviceName);
+    } catch (Exception e) {
+      RobotLog.e("DcMotorAccess - caught " + e);
+      RobotLog.e("DcMotorAccess - dcMotor is null");
+    }
     this.dcMotor = dcMotor;
   }
 
   @SuppressWarnings("unused")
   @JavascriptInterface
   public void setPower(double power) {
-    dcMotor.setPower(power);
+    if (dcMotor != null) {
+      dcMotor.setPower(power);
+    }
   }
 
   @SuppressWarnings("unused")
   @JavascriptInterface
   public void setMode(String runModeString) {
-    RunMode runMode = RunMode.valueOf(runModeString.toUpperCase(Locale.ENGLISH));
-    dcMotor.setMode(runMode);
+    if (dcMotor != null) {
+      RunMode runMode = RunMode.valueOf(runModeString.toUpperCase(Locale.ENGLISH));
+      dcMotor.setMode(runMode);
+    }
   }
 
   @SuppressWarnings("unused")
   @JavascriptInterface
   public void setTargetPosition(double position) {
-    dcMotor.setTargetPosition((int) position);
+    if (dcMotor != null) {
+      dcMotor.setTargetPosition((int) position);
+    }
   }
 
   @SuppressWarnings("unused")
   @JavascriptInterface
   public void setDirection(String directionString) {
-    Direction direction = Direction.valueOf(directionString.toUpperCase(Locale.ENGLISH));
-    dcMotor.setDirection(direction);
+    if (dcMotor != null) {
+      RobotLog.i("HeyLiz - DcMotorAccess.setDirection - directionString is " + directionString);
+      Direction direction = Direction.valueOf(directionString.toUpperCase(Locale.ENGLISH));
+      RobotLog.i("HeyLiz - DcMotorAccess.setDirection - direction is " + direction);
+      dcMotor.setDirection(direction);
+    }
   }
 
   @SuppressWarnings("unused")
   @JavascriptInterface
   public double getPower() {
-    return dcMotor.getPower();
+    if (dcMotor != null) {
+      return dcMotor.getPower();
+    }
+    return 0;
   }
 
   @SuppressWarnings("unused")
   @JavascriptInterface
   public int getCurrentPosition() {
-    return dcMotor.getCurrentPosition();
+    if (dcMotor != null) {
+      return dcMotor.getCurrentPosition();
+    }
+    return 0;
   }
 }

@@ -97,11 +97,8 @@ public class BlocksOpMode extends LinearOpMode {
       // scriptFinishedLock.wait() will be interrupted.
       boolean interrupted = false;
       try {
-        RobotLog.i("BlocksOpMode - before scriptFinishedLock.wait");
         scriptFinishedLock.wait();
-        RobotLog.i("BlocksOpMode - after scriptFinishedLock.wait");
       } catch (InterruptedException e) {
-        RobotLog.i("BlocksOpMode - scriptFinishedLock.wait was interrupted");
         interrupted = true;
       }
 
@@ -110,13 +107,9 @@ public class BlocksOpMode extends LinearOpMode {
         public void run() {
           try {
             // TODO(lizlooney) - find out if the following stops a runaway script from executing.
-            RobotLog.i("BlocksOpMode - run 2 - before removeJavascriptInterfaces");
             removeJavascriptInterfaces();
-            RobotLog.i("BlocksOpMode - run 2 - after removeJavascriptInterfaces");
 
-            RobotLog.i("BlocksOpMode - run 2 - before webView.loadData(\"\", ...)");
             clearScript();
-            RobotLog.i("BlocksOpMode - run 2 - after webView.loadData(\"\", ...)");
           } catch (Exception e) {
             RobotLog.e("BlocksOpMode - run 2 - caught " + e);
             // The exception may not have a stacktrace, so we check before calling
@@ -143,17 +136,16 @@ public class BlocksOpMode extends LinearOpMode {
     webView.addJavascriptInterface(
         new RobotControllerAccess(telemetry), ROBOT_CONTROLLER_IDENTIFIER);
     webView.addJavascriptInterface(
-        new DcMotorAccess(hardwareMap.dcMotor.get(LEFT_MOTOR_DEVICE_NAME)),
+        new DcMotorAccess(hardwareMap, LEFT_MOTOR_DEVICE_NAME),
         LEFT_MOTOR_IDENTIFIER);
     webView.addJavascriptInterface(
-        new DcMotorAccess(hardwareMap.dcMotor.get(RIGHT_MOTOR_DEVICE_NAME)),
+        new DcMotorAccess(hardwareMap, RIGHT_MOTOR_DEVICE_NAME),
         RIGHT_MOTOR_IDENTIFIER);
     webView.addJavascriptInterface(
-        new TouchSensorAccess(hardwareMap.touchSensor.get(TOUCH_SENSOR_DEVICE_NAME)),
+        new TouchSensorAccess(hardwareMap, TOUCH_SENSOR_DEVICE_NAME),
         TOUCH_SENSOR_IDENTIFIER);
     webView.addJavascriptInterface(
-        new OpticalDistanceSensorAccess(
-            hardwareMap.opticalDistanceSensor.get(OPTICAL_DISTANCE_SENSOR_DEVICE_NAME)),
+        new OpticalDistanceSensorAccess(hardwareMap, OPTICAL_DISTANCE_SENSOR_DEVICE_NAME),
         OPTICAL_DISTANCE_SENSOR_IDENTIFIER);
   }
 
@@ -177,11 +169,8 @@ public class BlocksOpMode extends LinearOpMode {
     @SuppressWarnings("unused")
     @JavascriptInterface
     public void scriptFinished() {
-      RobotLog.i("BlocksOpMode - scriptFinished");
       synchronized (scriptFinishedLock) {
-        RobotLog.i("BlocksOpMode - scriptFinished - before scriptFinishedLock.notifyAll");
         scriptFinishedLock.notifyAll();
-        RobotLog.i("BlocksOpMode - scriptFinished - after scriptFinishedLock.notifyAll");
       }
     }
   }

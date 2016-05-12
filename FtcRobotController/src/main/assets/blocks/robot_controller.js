@@ -37,7 +37,7 @@ Blockly.JavaScript['robotController_telemetryAddNumericData'] = function(block) 
   var number = Blockly.JavaScript.valueToCode(
       block, 'NUMBER', Blockly.JavaScript.ORDER_COMMA);
   return robotControllerIdentifier +
-      '.addData(' + key + ', ' + number + ');\n';
+      '.addNumericData(' + key + ', ' + number + ');\n';
 };
 
 Blockly.Blocks['robotController_telemetryAddTextData'] = {
@@ -66,5 +66,5 @@ Blockly.JavaScript['robotController_telemetryAddTextData'] = function(block) {
   var text = Blockly.JavaScript.valueToCode(
       block, 'TEXT', Blockly.JavaScript.ORDER_COMMA);
   return robotControllerIdentifier +
-      '.addData(' + key + ', ' + text + ');\n';
+      '.addTextData(' + key + ', ' + text + ');\n';
 };
