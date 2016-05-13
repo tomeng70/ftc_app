@@ -419,7 +419,7 @@
       </block>
       <block type="math_random_float"></block>
     </category>
-    <category name="Lists">
+    <category name="Lists" colour="260">
       <block type="lists_create_empty"></block>
       <block type="lists_create_with"></block>
       <block type="lists_repeat">
@@ -468,7 +468,7 @@
     function save() {
       // Get the blocks as xml (text).
       var xml = Blockly.Xml.workspaceToDom(workspace);
-      var xmlText = Blockly.Xml.domToText(xml);
+      var xmlBlocks = Blockly.Xml.domToText(xml);
       // Generate JavaScript code.
       Blockly.JavaScript.addReservedWords('runOpMode');
       Blockly.JavaScript.addReservedWords('blocksOpmode');
@@ -478,13 +478,21 @@
       Blockly.JavaScript.addReservedWords('robotController');
       Blockly.JavaScript.addReservedWords('sensorOpticalDistance');
       Blockly.JavaScript.addReservedWords('sensorTouch');
-      var code = Blockly.JavaScript.workspaceToCode(workspace);
+      var jsCode = Blockly.JavaScript.workspaceToCode(workspace);
       if (typeof blocksIO !== 'undefined') {
         // Save it to sdcard.
-        blocksIO.saveBlocks(xmlText, code);
+        blocksIO.saveBlocks(xmlBlocks, jsCode);
       } else {
-        document.getElementById('generatedCodeBox').textContent = code;
+        document.getElementById('generatedCodeBox').textContent = jsCode;
         document.getElementById('generatedCodeBox').style.display = 'block';
+        var name = 'Blocks'; // TODO(lizlooney): We still need a name provided by the user!
+        var link = document.createElement("a");
+        link.download = name + '.blk';
+        link.href = '/?text=' + encodeURIComponent(xmlBlocks);
+        link.click();
+        link.download = name + '.js';
+        link.href = '/?text=' + encodeURIComponent(jsCode);
+        link.click();
       }
     }
   </script>
