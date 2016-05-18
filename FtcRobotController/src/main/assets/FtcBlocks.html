@@ -42,10 +42,12 @@
   <table>
     <tr>
       <td valign="top">
-        <h1>FTC Blocks<h1>
-        <button onclick="save()">Save</button>
+        <h1>FTC Blocks</h1>
+        <input type="file" accept=".blk" name="fileToOpen" id="fileToOpen">
+        <button onclick="openBlocks()">Open</button><br>
+        <button onclick="saveBlocks()">Save</button>
       </td>
-      <td>
+      <td valign="top">
         <textarea style="display:none" id="generatedCodeBox" rows="6" cols="60">...</textarea>
       </td>
     </tr>
@@ -440,6 +442,7 @@
   </xml>
 
   <script>
+    var currentProjectName = 'Blocks';
     var blocklyArea = document.getElementById('blocklyArea');
     var blocklyDiv = document.getElementById('blocklyDiv');
     var workspace = Blockly.inject(blocklyDiv,
@@ -465,35 +468,71 @@
     window.addEventListener('resize', onresize, false);
     onresize();
 
-    function save() {
-      // Get the blocks as xml (text).
-      var xml = Blockly.Xml.workspaceToDom(workspace);
-      var xmlBlocks = Blockly.Xml.domToText(xml);
-      // Generate JavaScript code.
-      Blockly.JavaScript.addReservedWords('runOpMode');
-      Blockly.JavaScript.addReservedWords('blocksOpmode');
-      Blockly.JavaScript.addReservedWords('linearOpMode');
-      Blockly.JavaScript.addReservedWords('motorL');
-      Blockly.JavaScript.addReservedWords('motorR');
-      Blockly.JavaScript.addReservedWords('robotController');
-      Blockly.JavaScript.addReservedWords('sensorOpticalDistance');
-      Blockly.JavaScript.addReservedWords('sensorTouch');
-      var jsCode = Blockly.JavaScript.workspaceToCode(workspace);
+    function openBlocks() {
       if (typeof blocksIO !== 'undefined') {
-        // Save it to sdcard.
-        blocksIO.saveBlocks(xmlBlocks, jsCode);
+        // TODO(lizlooney): open .blk file from /sdcard/FIRST/blocks
       } else {
-        document.getElementById('generatedCodeBox').textContent = jsCode;
-        document.getElementById('generatedCodeBox').style.display = 'block';
-        var name = 'Blocks'; // TODO(lizlooney): We still need a name provided by the user!
-        var link = document.createElement("a");
-        link.download = name + '.blk';
-        link.href = '/?text=' + encodeURIComponent(xmlBlocks);
-        link.click();
-        link.download = name + '.js';
-        link.href = '/?text=' + encodeURIComponent(jsCode);
-        link.click();
+        var selectedFile = document.getElementById('fileToOpen').files[0];
+        if (selectedFile != undefined) {
+          var iDotBlk = selectedFile.name.indexOf('.blk');
+          if (iDotBlk > -1) {
+            var selectedProjectName = selectedFile.name.substring(0, iDotBlk);
+            var reader = new FileReader();
+            reader.onload = function(evt) {
+              var blkContent = evt.target.result;
+              Blockly.Xml.domToWorkspace(workspace, Blockly.Xml.textToDom(blkContent));
+              currentProjectName = selectedProjectName;
+            };
+            reader.readAsBinaryString(selectedFile);
+          } else {
+            alert('You must select a .blk file.');
+          }
+        }
       }
+    }
+
+    function saveBlocks() {
+      // Get the blocks as xml (text).
+      var blkContent = Blockly.Xml.domToText(Blockly.Xml.workspaceToDom(workspace));
+      // Don't bother generating empty stuff.
+      if (blkContent.indexOf('<block') > -1) {
+        // Generate JavaScript code.
+        Blockly.JavaScript.addReservedWords('runOpMode');
+        Blockly.JavaScript.addReservedWords('blocksOpmode');
+        Blockly.JavaScript.addReservedWords('linearOpMode');
+        Blockly.JavaScript.addReservedWords('motorL');
+        Blockly.JavaScript.addReservedWords('motorR');
+        Blockly.JavaScript.addReservedWords('robotController');
+        Blockly.JavaScript.addReservedWords('sensorOpticalDistance');
+        Blockly.JavaScript.addReservedWords('sensorTouch');
+        var jsContent = Blockly.JavaScript.workspaceToCode(workspace);
+        if (typeof blocksIO !== 'undefined') {
+          // Save blocks and generated JavaScript to sdcard.
+          blocksIO.saveBlocks(blkContent, jsContent);
+        } else {
+          // Save blocks and generated JavaScript as files.
+          var blkLink = document.createElement('a');
+          blkLink.download = currentProjectName + '.blk';
+          var blkFile = saveFile(blkContent);
+          blkLink.href = blkFile;
+          blkLink.click();
+          //window.URL.revokeObjectUrl(blkFile);
+          var jsLink = document.createElement('a');
+          jsLink.download = currentProjectName + '.js';
+          var jsFile = saveFile(jsContent);
+          jsLink.href = jsFile;
+          jsLink.click();
+          //window.URL.revokeObjectUrl(jsFile);
+          // Show the generated JavaScript.
+          document.getElementById('generatedCodeBox').textContent = jsContent;
+          document.getElementById('generatedCodeBox').style.display = 'block';
+        }
+      }
+    }
+
+    function saveFile(text) {
+      var blob = new Blob([text], {type: 'text/plain'});
+      return window.URL.createObjectURL(blob);
     }
   </script>
 </body>
