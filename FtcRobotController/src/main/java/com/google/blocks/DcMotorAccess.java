@@ -58,9 +58,7 @@ class DcMotorAccess {
   @JavascriptInterface
   public void setDirection(String directionString) {
     if (dcMotor != null) {
-      RobotLog.i("HeyLiz - DcMotorAccess.setDirection - directionString is " + directionString);
       Direction direction = Direction.valueOf(directionString.toUpperCase(Locale.ENGLISH));
-      RobotLog.i("HeyLiz - DcMotorAccess.setDirection - direction is " + direction);
       dcMotor.setDirection(direction);
     }
   }

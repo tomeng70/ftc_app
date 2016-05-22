@@ -1,0 +1,31 @@
+<!--
+  Author: lizlooney@google.com (Liz Looney)
+-->
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+  xmlns:tools="http://schemas.android.com/tools"
+  android:layout_width="match_parent"
+  android:layout_height="match_parent"
+  tools:context="com.google.server.ServerActivity"
+  android:orientation="vertical">
+
+  <TextView
+    android:text="@string/server_info"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content" />
+
+  <TextView
+    android:id="@+id/host_and_port"
+    android:textStyle="bold" 
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content" />
+
+  <ScrollView
+    android:id="@+id/scrollView"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+    <TextView
+      android:id="@+id/log"
+      android:layout_width="wrap_content"
+      android:layout_height="wrap_content"/>
+  </ScrollView>
+</LinearLayout>

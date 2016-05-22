@@ -68,6 +68,15 @@
       </intent-filter>
     </activity>
     <activity
+      android:name="com.google.server.ServerActivity"
+      android:label="@string/server_activity"
+      android:configChanges="orientation|screenSize">
+      <intent-filter>
+        <action android:name="com.google.server.ServerActivity.intent.action.Launch" />
+        <category android:name="android.intent.category.DEFAULT" />
+      </intent-filter>
+    </activity>
+    <activity
       android:name="com.qualcomm.ftccommon.FtcRobotControllerSettingsActivity"
       android:label="@string/settings_activity" >
     </activity>

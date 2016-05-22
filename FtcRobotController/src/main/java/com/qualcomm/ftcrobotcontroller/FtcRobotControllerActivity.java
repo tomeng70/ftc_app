@@ -290,6 +290,10 @@ public class FtcRobotControllerActivity extends Activity {
   @Override
   public boolean onOptionsItemSelected(MenuItem item) {
     switch (item.getItemId()) {
+      case R.id.action_server:
+        Intent serverIntent = new Intent("com.google.server.ServerActivity.intent.action.Launch");
+        startActivity(serverIntent);
+        return true;
       case R.id.action_blocks:
         Intent blocksIntent = new Intent("com.google.blocks.BlocksActivity.intent.action.Launch");
         startActivity(blocksIntent);

@@ -38,21 +38,32 @@
     }
   </style>
 </head>
-<body>
+<body onload="updateListOfProjects()">
   <table>
     <tr>
       <td valign="top">
         <h1>FTC Blocks</h1>
-        <input type="file" accept=".blk" name="fileToOpen" id="fileToOpen">
-        <button onclick="openBlocks()">Open</button><br>
-        <button onclick="saveBlocks()">Save</button>
-      </td>
-      <td valign="top">
-        <textarea style="display:none" id="generatedCodeBox" rows="6" cols="60">...</textarea>
+        <table margin="0">
+          <tr><td>
+            <!-- fileToOpen is only used when FtcBlocks.html is in a browser, loaded as a file:// URL. -->
+            <input type="file" accept=".blk" name="fileToOpen" id="fileToOpen" style="display:none">
+
+            <input list="listOfProjects" name="currentProject" id="currentProject">
+            <datalist id="listOfProjects">
+            </datalist>
+          </td></tr>
+          <tr><td>
+            <button onclick="openProject()">Open</button><br>
+          </td></tr>
+          <tr><td>
+            <button onclick="saveProject()">Save</button>
+          </td></tr>
+        </table>
+
       </td>
     </tr>
     <tr>
-      <td id="blocklyArea" colspan="2">
+      <td id="blocklyArea">
       </td>
     </tr>
   </table>
@@ -442,7 +453,6 @@
   </xml>
 
   <script>
-    var currentProjectName = 'Blocks';
     var blocklyArea = document.getElementById('blocklyArea');
     var blocklyDiv = document.getElementById('blocklyDiv');
     var workspace = Blockly.inject(blocklyDiv,
@@ -468,33 +478,48 @@
     window.addEventListener('resize', onresize, false);
     onresize();
 
-    function openBlocks() {
+    /**
+     * Updates the UI with the names of existing projects.
+     * Called from body onload.
+     */
+    function updateListOfProjects() {
       if (typeof blocksIO !== 'undefined') {
-        // TODO(lizlooney): open .blk file from /sdcard/FIRST/blocks
-      } else {
-        var selectedFile = document.getElementById('fileToOpen').files[0];
-        if (selectedFile != undefined) {
-          var iDotBlk = selectedFile.name.indexOf('.blk');
-          if (iDotBlk > -1) {
-            var selectedProjectName = selectedFile.name.substring(0, iDotBlk);
-            var reader = new FileReader();
-            reader.onload = function(evt) {
-              var blkContent = evt.target.result;
-              Blockly.Xml.domToWorkspace(workspace, Blockly.Xml.textToDom(blkContent));
-              currentProjectName = selectedProjectName;
-            };
-            reader.readAsBinaryString(selectedFile);
-          } else {
-            alert('You must select a .blk file.');
-          }
-        }
+        // FtcBlocks.html is within the WebView component within the Android app.
+        updateListOfProjectsViaBlocksIO();
+      } else if (window.location.protocol === 'http:') {
+        // FtcBlocks.html is in a browser, loaded as an http:// URL.
+        updateListOfProjectsViaHttp();
+      } else if (window.location.protocol === 'file:') {
+        // FtcBlocks.html is in a browser, loaded as a file:// URL.
+        updateListOfProjectsViaFile();
       }
     }
 
-    function saveBlocks() {
+    /**
+     * Opens an existing project.
+     * Called from Open button onclick.
+     */
+    function openProject() {
+      if (typeof blocksIO !== 'undefined') {
+        // FtcBlocks.html is within the WebView component within the Android app.
+        openProjectViaBlocksIO();
+      } else if (window.location.protocol === 'http:') {
+        // FtcBlocks.html is in a browser, loaded as an http:// URL.
+        openProjectViaHttp();
+      } else if (window.location.protocol === 'file:') {
+        // FtcBlocks.html is in a browser, loaded as a file:// URL.
+        openProjectViaFile();
+      }
+    }
+
+    /**
+     * Saves the workspace blocks and generated javascript.
+     * Called from Save button onclick.
+     */
+    function saveProject() {
       // Get the blocks as xml (text).
       var blkContent = Blockly.Xml.domToText(Blockly.Xml.workspaceToDom(workspace));
-      // Don't bother generating empty stuff.
+      // Don't bother saving if thereare no blocks.
       if (blkContent.indexOf('<block') > -1) {
         // Generate JavaScript code.
         Blockly.JavaScript.addReservedWords('runOpMode');
@@ -506,33 +531,164 @@
         Blockly.JavaScript.addReservedWords('sensorOpticalDistance');
         Blockly.JavaScript.addReservedWords('sensorTouch');
         var jsContent = Blockly.JavaScript.workspaceToCode(workspace);
+
         if (typeof blocksIO !== 'undefined') {
-          // Save blocks and generated JavaScript to sdcard.
-          blocksIO.saveBlocks(blkContent, jsContent);
-        } else {
-          // Save blocks and generated JavaScript as files.
-          var blkLink = document.createElement('a');
-          blkLink.download = currentProjectName + '.blk';
-          var blkFile = saveFile(blkContent);
-          blkLink.href = blkFile;
-          blkLink.click();
-          //window.URL.revokeObjectUrl(blkFile);
-          var jsLink = document.createElement('a');
-          jsLink.download = currentProjectName + '.js';
-          var jsFile = saveFile(jsContent);
-          jsLink.href = jsFile;
-          jsLink.click();
-          //window.URL.revokeObjectUrl(jsFile);
-          // Show the generated JavaScript.
-          document.getElementById('generatedCodeBox').textContent = jsContent;
-          document.getElementById('generatedCodeBox').style.display = 'block';
+          // FtcBlocks.html is within the WebView component within the Android app.
+          saveProjectViaBlocksIO(blkContent, jsContent);
+        } else if (window.location.protocol === 'http:') {
+          // FtcBlocks.html is in a browser, loaded as an http:// URL.
+          saveProjectViaHttp(blkContent, jsContent);
+        } else if (window.location.protocol === 'file:') {
+          // FtcBlocks.html is in a browser, loaded as a file:// URL.
+          saveProjectViaFile(blkContent, jsContent);
         }
       }
     }
 
-    function saveFile(text) {
-      var blob = new Blob([text], {type: 'text/plain'});
-      return window.URL.createObjectURL(blob);
+    /**
+     * Fills the listOfProjects datalist element with the given csvProjects.
+     * Shows the currentProject list input element.
+     */
+    function fillListOfProjects(csvProjects) {
+      var projects = csvProjects.split(',');
+      var options = '';
+      for(var i = 0; i < projects.length; i++)  {
+        options += '<option value="' + projects[i] + '" />';
+      }
+      document.getElementById('listOfProjects').innerHTML = options;
+      onresize();
+    }
+
+    /**
+     * Loads the given blkContent into the workspace.
+     */
+    function loadBlocksIntoWorkspace(blkContent) {
+      Blockly.Xml.domToWorkspace(workspace, Blockly.Xml.textToDom(blkContent));
+    }
+
+    //..........................................................................
+    // Code used when FtcBlocks.html is within the WebView component within the
+    // Android app.
+
+    function updateListOfProjectsViaBlocksIO() {
+      var csvProjects = blocksIO.listProjects();
+      fillListOfProjects(csvProjects);
+    }
+
+    function openProjectViaBlocksIO() {
+      var currentProject = document.getElementById('currentProject').value;
+      if (currentProject !== '') {
+        var blkContent = blocksIO.openProject(currentProject);
+        loadBlocksIntoWorkspace(blkContent);
+      } else {
+        alert('You must select a project to open.');
+      }
+    }
+
+    function saveProjectViaBlocksIO(blkContent, jsContent) {
+      var currentProject = document.getElementById('currentProject').value;
+      if (currentProject !== '') {
+        blocksIO.saveProject(currentProject, blkContent, jsContent);
+        updateListOfProjectsViaBlocksIO();
+      } else {
+        alert('You must enter a project name.');
+      }
+    }
+
+    //..........................................................................
+    // Code used when FtcBlocks.html is in a browser, loaded as a http:// URL.
+
+    function updateListOfProjectsViaHttp() {
+      var xhr = new XMLHttpRequest();
+      xhr.open('GET', '/list', true);
+      xhr.setRequestHeader('Content-type', 'application/x-www-form-urlencoded');
+      xhr.onload = function() {
+        var csvProjects = xhr.responseText;
+        fillListOfProjects(csvProjects);
+      }
+      xhr.send();
+    }
+
+    function openProjectViaHttp() {
+      var currentProject = document.getElementById('currentProject').value;
+      if (currentProject !== '') {
+        var xhr = new XMLHttpRequest();
+        var params = 'project=' + encodeURIComponent(currentProject);
+        xhr.open('POST', '/load', true);
+        xhr.setRequestHeader('Content-type', 'application/x-www-form-urlencoded');
+        xhr.onload = function() {
+          var blkContent = xhr.responseText;
+          loadBlocksIntoWorkspace(blkContent);
+        }
+        xhr.send(params);
+      } else {
+        alert('You must select a project to open.');
+      }
+    }
+
+    function saveProjectViaHttp(blkContent, jsContent) {
+      var currentProject = document.getElementById('currentProject').value;
+      if (currentProject !== '') {
+        var xhr = new XMLHttpRequest();
+        var params = 'project=' + encodeURIComponent(currentProject) +
+            '&blk=' + encodeURIComponent(blkContent) +
+            '&js=' + encodeURIComponent(jsContent);
+        xhr.open('POST', '/save', true);
+        xhr.setRequestHeader('Content-type', 'application/x-www-form-urlencoded');
+        xhr.onload = function() {
+          updateListOfProjectsViaHttp();
+        }
+        xhr.send(params);
+      } else {
+        alert('You must enter a project name.');
+      }
+    }
+
+    //..........................................................................
+    // Code used when FtcBlocks.html is in a browser, loaded as a file:// URL.
+
+    var currentProjectName = 'Blocks';
+
+    function updateListOfProjectsViaFile() {
+      // There is no way (to my knowledge) to get the list of existing projects,
+      // so instead we show a file input and allow the user to choose a .blk
+      // file.
+      document.getElementById('fileToOpen').style.display = 'block';
+      document.getElementById('currentProject').style.display = 'none';
+    }
+
+    function openProjectViaFile() {
+      var selectedFile = document.getElementById('fileToOpen').files[0];
+      if (selectedFile != undefined) {
+        var iDotBlk = selectedFile.name.indexOf('.blk');
+        if (iDotBlk > -1) {
+          var selectedProjectName = selectedFile.name.substring(0, iDotBlk);
+          var reader = new FileReader();
+          reader.onload = function(evt) {
+            var blkContent = evt.target.result;
+            loadBlocksIntoWorkspace(blkContent);
+            currentProjectName = selectedProjectName;
+          };
+          reader.readAsBinaryString(selectedFile);
+        } else {
+          alert('You must select a .blk file.');
+        }
+      }
+    }
+  
+    function saveProjectViaFile(blkContent, jsContent) {
+      downloadFile(blkContent, currentProjectName + '.blk');
+      downloadFile(jsContent, currentProjectName + '.js');
+    }
+
+    function downloadFile(content, name) {
+      var link = document.createElement('a');
+      link.download = name;
+      var blob = new Blob([content], {type: 'text/plain'});
+      var file = window.URL.createObjectURL(blob);
+      link.href = file;
+      link.click();
+      //window.URL.revokeObjectUrl(file);
     }
   </script>
 </body>

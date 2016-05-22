@@ -1,29 +1,23 @@
 package com.google.blocks;
 
+import com.google.util.ProjectsUtil;
+
+import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
+import com.qualcomm.robotcore.eventloop.opmode.OpModeManager;
+import com.qualcomm.robotcore.util.RobotLog;
+
 import android.app.Activity;
 import android.webkit.JavascriptInterface;
 import android.webkit.WebSettings;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
 
-import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
-import com.qualcomm.robotcore.eventloop.opmode.OpModeManager;
-import com.qualcomm.robotcore.util.RobotLog;
-
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileFilter;
-import java.io.IOException;
-import java.nio.charset.StandardCharsets;
-
 /**
- * A subclass of {@link LinearOpMode} that reads in javascript from a file and executes it.
+ * A subclass of {@link LinearOpMode} that loads JavaScript from a file and executes it.
  *
  * @author lizlooney@google.com (Liz Looney)
  */
 public class BlocksOpMode extends LinearOpMode {
-  private static final String JAVASCRIPT_EXTENSION = ".js";
-
   private static final String BLOCKS_OP_MODE_IDENTIFIER = "blocksOpMode";
   private static final String LINEAR_OP_MODE_IDENTIFIER = "linearOpMode";
   private static final String ROBOT_CONTROLLER_IDENTIFIER = "robotController";
@@ -40,37 +34,23 @@ public class BlocksOpMode extends LinearOpMode {
   private static Activity activity;
   private static WebView webView;
 
-  private final String name;
-  private final String script;
+  private final String project;
+  private final String javaScript;
 
   /**
-   * Instantiates a BlocksOpMode that reads javascript from the given file and executes it when the
-   * opMode is run.
+   * Instantiates a BlocksOpMode that loads JavaScript for the given project and executes it when
+   * the opMode is run.
+   *
+   * @param project the name of the project.
    */
-  private BlocksOpMode(String name, File file) {
-    this.name = name;
-    script = readFile(file);
-  }
-
-  private String readFile(File file) {
-    try {
-      byte[] bytes = new byte[(int) file.length()];
-      FileInputStream fileInputStream = new FileInputStream(file);
-      try {
-        fileInputStream.read(bytes);
-      } finally {
-        fileInputStream.close();
-      }
-      return new String(bytes, StandardCharsets.ISO_8859_1);
-    } catch (IOException e) {
-      RobotLog.logStacktrace(e);
-    }
-    return "";
+  private BlocksOpMode(String project, String javaScript) {    
+    this.project = project;
+    this.javaScript = javaScript;
   }
 
   @Override
   public void runOpMode() throws InterruptedException {
-    RobotLog.i("BlocksOpMode - start of runOpMode for " + name);
+    RobotLog.i("BlocksOpMode - start of runOpMode for " + project);
 
     final Object scriptFinishedLock = new Object();
 
@@ -124,7 +104,7 @@ public class BlocksOpMode extends LinearOpMode {
       if (interrupted) {
         Thread.currentThread().interrupt();
       }
-      RobotLog.i("BlocksOpMode - end of runOpMode for " + name);
+      RobotLog.i("BlocksOpMode - end of runOpMode for " + project);
     }
   }
 
@@ -178,7 +158,7 @@ public class BlocksOpMode extends LinearOpMode {
   private void loadScript() {
     String html = "<html><body onload='runOpMode()'><script type='text/javascript'>"
         + "function runOpMode() {\n"
-        + script
+        + javaScript
         + "  blocksOpMode.scriptFinished();\n"
         + "}\n"
         + "</script></body></html>\n";
@@ -199,31 +179,17 @@ public class BlocksOpMode extends LinearOpMode {
   }
 
   /**
-   * Registers a {@link BlocksOpMode} for each javascript file found in /sdcard/FIRST/blocks.
-   * Javascript files are identified by the .js file extension.
+   * Registers a {@link BlocksOpMode} for each blocks project that has a JavaScript file.
    */
   public static void registerAll(OpModeManager manager) {
     try {
-      File directory = new File("/sdcard/FIRST/blocks");
-      if (directory.isDirectory()) {
-        File[] files = directory.listFiles(new FileFilter() {
-          @Override
-          public boolean accept(File file) {
-            return file.isFile()
-                && file.canRead()
-                && file.getName().endsWith(JAVASCRIPT_EXTENSION);
-          }
-        });
-        if (files != null) {
-          for (File file :  files) {
-            String name = file.getName();
-            name = name.substring(0, name.length() - JAVASCRIPT_EXTENSION.length());
-            try {
-              manager.register(name, new BlocksOpMode(name, file));
-            } catch (Exception e) {
-              RobotLog.logStacktrace(e);
-            }
-          }
+      String[] projects = ProjectsUtil.listProjectsJavaScript();
+      for (String project : projects) {
+        try {
+          String javaScript = ProjectsUtil.loadProjectJavaScript(project);
+          manager.register(project, new BlocksOpMode(project, javaScript));
+        } catch (Exception e) {
+          RobotLog.logStacktrace(e);
         }
       }
     } catch (Exception e) {
