@@ -1,13 +1,12 @@
 package com.google.server;
 
-import com.qualcomm.ftcrobotcontroller.R;
-import com.qualcomm.robotcore.util.RobotLog;
-
 import android.app.Activity;
 import android.os.Bundle;
-import android.view.Menu;
-import android.view.MenuItem;
 import android.widget.TextView;
+
+import com.qualcomm.ftcrobotcontroller.R;
+import com.qualcomm.robotcore.util.RobotLog;
+import com.qualcomm.robotcore.wifi.WifiDirectAssistant;
 
 import java.io.IOException;
 import java.net.InetAddress;
@@ -37,6 +36,7 @@ public class ServerActivity extends Activity {
     server = new Server(port, this);
     try {
       server.start();
+      showP2pInfo();
       showHostAndPort();
     } catch (IOException e) {
       RobotLog.logStacktrace(e);
@@ -148,5 +148,32 @@ public class ServerActivity extends Activity {
       unknownHostException.initCause(e);
       throw unknownHostException;
     }
+  }
+
+  private void showP2pInfo()  {
+    // try to get the wifi direct assistant.
+    WifiDirectAssistant wda;
+    try {
+      wda = WifiDirectAssistant.getWifiDirectAssistant(null);
+      wda.enable();
+    } catch (NullPointerException e) {
+      RobotLog.i("Cannot start Wifi Direct Assistant");
+      wda = null;
+    }
+
+    String groupOwnerName;
+    String groupPassphrase;
+    if (wda != null)  {
+      groupOwnerName = wda.getGroupOwnerName();
+      groupPassphrase = wda.getPassphrase();
+    } else {
+      groupOwnerName = getString(R.string.p2p_unavailable);
+      groupPassphrase = getString(R.string.p2p_unavailable);
+    }
+
+    TextView textP2pGroupOwner = (TextView) findViewById(R.id.p2p_group_owner);
+    textP2pGroupOwner.setText(groupOwnerName);
+    TextView textPassphrase = (TextView) findViewById(R.id.p2p_passphrase);
+    textPassphrase.setText(groupPassphrase);
   }
 }
