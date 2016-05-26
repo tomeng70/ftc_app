@@ -161,18 +161,21 @@ public class ServerActivity extends Activity {
       wda = null;
     }
 
-    String groupOwnerName;
-    String groupPassphrase;
+    String groupOwnerName = "";
+    String groupPassphrase = "";
+    String groupInterface = "";
+    String groupNetworkName = "";
     if (wda != null)  {
       groupOwnerName = wda.getGroupOwnerName();
       groupPassphrase = wda.getPassphrase();
-    } else {
-      groupOwnerName = getString(R.string.p2p_unavailable);
-      groupPassphrase = getString(R.string.p2p_unavailable);
+      groupInterface = wda.getGroupInterface();
+      groupNetworkName = wda.getGroupNetworkName();
     }
 
     TextView textP2pGroupOwner = (TextView) findViewById(R.id.p2p_group_owner);
     textP2pGroupOwner.setText(groupOwnerName);
+    TextView textP2pNetworkName = (TextView) findViewById(R.id.p2p_network_name);
+    textP2pNetworkName.setText(groupNetworkName);
     TextView textPassphrase = (TextView) findViewById(R.id.p2p_passphrase);
     textPassphrase.setText(groupPassphrase);
   }

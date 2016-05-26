@@ -57,6 +57,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
   <string name="server_menu_item">Server</string>
   <string name="server_activity">Server</string>
   <string name="p2p_group_owner_info">WiFi Direct Group Owner: </string>
+  <string name="p2p_network_name">WiFi Direct Network Name: </string>
   <string name="p2p_passphrase_info">WiFi Direct Passphrase: </string>
   <string name="server_info">Server is listening at: </string>
   <string name="p2p_unavailable"><UNAVAILABLE></UNAVAILABLE></string>
